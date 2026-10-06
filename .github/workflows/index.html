@@ -1,0 +1,860 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CHALDEA | Terminal Archive</title>
+
+    <!-- replace the below with your own text Mo please -->
+    <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+    <meta name="description" content="CHALDEAS Terminal Archive — Collection & Information about Archetype_Narrator (Beast's Lair Profile: Narrator) and his works."> 
+    <meta property="og:title" content="CHALDEAS | Terminal Archive">
+    <meta property="og:description" content="Collection & Information about Archetype_Narrator (Beast's Lair Profile: Narrator) and his works."> 
+    <meta property="og:type" content="website">
+    <meta property="og:image" content="https://archetype-narrator.github.io/TheAnalect/assets/img/200643.png"> 
+    <meta property="og:url" content="https://archetype-narrator.github.io/TheAnalect"> 
+    <meta name="twitter:card" content="summary_large_image">
+
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --hud-cyan: #b967ff;
+            --hud-blue-dark: rgba(28, 8, 48, 0.96);
+            --hud-border: #7c3aed;
+            --bg-deep: #0a0512;
+            --accent-gold: #d4af37;
+            --command-red: #ff3c3c;
+            --scanline: rgba(185, 103, 255, 0.03);
+            --card-glow: rgba(185, 103, 255, 0.1);
+            --header-height: 0px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; scrollbar-width: thin; scrollbar-color: var(--hud-border) var(--bg-deep); }
+
+        body {
+            background-color: var(--bg-deep);
+            background-image:
+                linear-gradient(rgba(10, 5, 18, 0.85), rgba(10, 5, 18, 0.85)),
+                url('https://images8.alphacoders.com/913/thumb-1920-913216.jpg');
+            background-attachment: fixed;
+            background-size: cover;
+            background-position: center;
+            color: #fff;
+            font-family: 'Outfit', sans-serif;
+            padding-top: var(--header-height);
+            padding-bottom: 60px;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-image:
+                linear-gradient(var(--scanline) 1px, transparent 1px),
+                linear-gradient(90deg, var(--scanline) 1px, transparent 1px);
+            background-size: 30px 30px;
+            pointer-events: none; z-index: -1;
+        }
+
+        
+        .control-panel {
+            position: fixed; top: 0; width: 100%;
+            background: rgba(10, 5, 18, 0.98);
+            border-bottom: 1px solid var(--hud-cyan);
+            z-index: 1000; padding: 15px 20px;
+            backdrop-filter: blur(20px);
+            box-shadow: 0 5px 25px rgba(0,0,0,0.8);
+        }
+
+        .search-container { max-width: 1400px; margin: 0 auto 15px; position: relative; }
+
+        #searchInput {
+            width: 100%; background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--hud-border);
+            padding: 12px 20px; color: var(--hud-cyan);
+            font-family: 'Outfit', sans-serif; font-size: 1rem;
+            outline: none; transition: 0.4s;
+            clip-path: polygon(0 0, 99% 0, 100% 30%, 100% 100%, 1% 100%, 0 70%);
+        }
+        #searchInput:focus { background: rgba(185, 103, 255, 0.08); border-color: var(--hud-cyan); box-shadow: 0 0 15px var(--card-glow); }
+        #searchInput::placeholder { color: rgba(185, 103, 255, 0.4); }
+
+        
+        .filter-wrapper { max-width: 1400px; margin: 0 auto; }
+
+        .filter-row {
+            display: flex; align-items: center;
+            gap: 10px; flex-wrap: wrap; position: relative;
+        }
+
+        
+        .filter-trigger {
+            background: transparent; border: 1px solid var(--hud-border);
+            color: var(--hud-cyan); padding: 6px 16px;
+            font-family: 'Cinzel', serif; font-size: 0.72rem;
+            letter-spacing: 1px; cursor: pointer; white-space: nowrap;
+            clip-path: polygon(8% 0, 100% 0, 92% 100%, 0 100%);
+            transition: background 0.3s, box-shadow 0.3s;
+        }
+        .filter-trigger:hover { background: rgba(185,103,255,0.1); }
+        .filter-trigger.open {
+            background: rgba(185,103,255,0.12);
+            border-color: var(--hud-cyan);
+            box-shadow: 0 0 10px rgba(185,103,255,0.15);
+        }
+        .filter-trigger .ft-arrow { margin-left: 8px; display: inline-block; transition: transform 0.25s; }
+        .filter-trigger.open .ft-arrow { transform: rotate(180deg); }
+
+        
+        .filter-badge {
+            display: inline-block; background: var(--hud-cyan);
+            color: var(--bg-deep); font-size: 0.6rem; font-weight: 800;
+            padding: 1px 5px; margin-left: 6px;
+            border-radius: 2px; vertical-align: middle;
+            font-family: 'Outfit', sans-serif; letter-spacing: 0;
+        }
+        .filter-badge.hidden { display: none; }
+
+        
+        .active-pill {
+            display: inline-flex; align-items: center; gap: 5px;
+            background: rgba(185,103,255,0.1); border: 1px solid var(--hud-cyan);
+            color: var(--hud-cyan); padding: 3px 10px;
+            font-family: 'Cinzel', serif; font-size: 0.65rem; letter-spacing: 1px;
+            clip-path: polygon(6% 0, 100% 0, 94% 100%, 0 100%);
+            cursor: pointer; transition: background 0.2s;
+        }
+        .active-pill:hover { background: rgba(255,60,60,0.15); border-color: var(--command-red); color: var(--command-red); }
+        .active-pill .pill-x { font-size: 0.7rem; opacity: 0.7; }
+
+        
+        .filter-clear {
+            background: transparent; border: 1px solid rgba(255,60,60,0.4);
+            color: rgba(255,60,60,0.7); padding: 4px 10px;
+            font-family: 'Cinzel', serif; font-size: 0.65rem; letter-spacing: 1px;
+            cursor: pointer; transition: 0.2s;
+            clip-path: polygon(8% 0, 100% 0, 92% 100%, 0 100%);
+        }
+        .filter-clear:hover { background: rgba(255,60,60,0.1); color: var(--command-red); border-color: var(--command-red); }
+        .filter-clear.hidden { display: none; }
+
+        
+        .filter-panel {
+            display: none; position: absolute;
+            top: calc(100% + 8px); left: 0;
+            background: rgba(1, 10, 20, 0.98);
+            border: 1px solid var(--hud-cyan);
+            padding: 16px; z-index: 2000;
+            min-width: 420px; max-width: 90vw;
+            max-height: 70vh; overflow-y: auto;
+            box-shadow: 0 8px 40px rgba(0,0,0,0.8), 0 0 20px rgba(185,103,255,0.05);
+            clip-path: polygon(0 0, 100% 0, 100% 95%, 97% 100%, 0 100%);
+            scrollbar-width: thin; scrollbar-color: var(--hud-border) transparent;
+        }
+        .filter-panel.open { display: block; }
+
+        .panel-group { margin-bottom: 12px; }
+        .panel-group:last-child { margin-bottom: 0; }
+        .panel-group-label {
+            font-family: 'Cinzel', serif; font-size: 0.6rem;
+            color: rgba(185,103,255,0.55); letter-spacing: 3px;
+            margin-bottom: 8px; padding: 4px 0;
+            border-bottom: 1px solid rgba(185,103,255,0.1);
+            cursor: pointer; user-select: none;
+            display: flex; align-items: center; justify-content: space-between;
+            transition: color 0.2s;
+        }
+        .panel-group-label:hover { color: var(--hud-cyan); }
+        .panel-group-label .pg-arrow { font-size: 0.55rem; transition: transform 0.2s; }
+        .panel-group.collapsed .pg-arrow { transform: rotate(-90deg); }
+        .panel-group.collapsed .panel-btns { display: none; }
+        .panel-btns { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 2px; }
+
+        .filter-btn {
+            background: transparent; border: 1px solid var(--hud-border);
+            color: var(--hud-cyan); padding: 4px 12px;
+            font-size: 0.68rem; cursor: pointer;
+            font-family: 'Cinzel', serif; letter-spacing: 1px;
+            clip-path: polygon(8% 0, 100% 0, 92% 100%, 0 100%);
+            transition: background 0.2s, box-shadow 0.2s;
+            white-space: nowrap;
+        }
+        .filter-btn:hover { background: rgba(185,103,255,0.12); }
+        .filter-btn.active {
+            background: var(--hud-cyan); color: var(--bg-deep);
+            font-weight: bold; box-shadow: 0 0 8px rgba(185,103,255,0.4);
+            border-color: var(--hud-cyan);
+        }
+
+        
+        .sort-toggle {
+            background: transparent; border: 1px solid var(--hud-border);
+            color: var(--hud-cyan); padding: 6px 14px;
+            font-size: 0.72rem; cursor: pointer; white-space: nowrap;
+            font-family: 'Cinzel', serif; letter-spacing: 1px;
+            clip-path: polygon(8% 0, 100% 0, 92% 100%, 0 100%);
+            transition: background 0.3s, box-shadow 0.3s;
+            margin-left: auto;
+        }
+        .sort-toggle:hover,
+        .sort-toggle:focus-visible { background: rgba(185,103,255,0.1); outline: none; }
+        .sort-toggle.active { background: rgba(212,175,55,0.2); border-color: var(--accent-gold); color: var(--accent-gold); box-shadow: 0 0 8px rgba(212,175,55,0.3); }
+
+        .wip-toggle {
+            background: transparent; border: 1px solid var(--hud-border);
+            color: var(--hud-cyan); padding: 6px 14px;
+            font-size: 0.72rem; cursor: pointer; white-space: nowrap;
+            font-family: 'Cinzel', serif; letter-spacing: 1px;
+            clip-path: polygon(8% 0, 100% 0, 92% 100%, 0 100%);
+            transition: background 0.3s, box-shadow 0.3s;
+        }
+        .wip-toggle:hover,
+        .wip-toggle:focus-visible { background: rgba(185,103,255,0.1); outline: none; }
+        .wip-toggle.wip-last  { background: rgba(255,60,60,0.1);  border-color: var(--command-red); color: var(--command-red);  box-shadow: 0 0 8px rgba(255,60,60,0.2); }
+        .wip-toggle.wip-first { background: rgba(255,60,60,0.2);  border-color: var(--command-red); color: var(--command-red);  box-shadow: 0 0 8px rgba(255,60,60,0.35); }
+
+        
+        .main-container { max-width: 1500px; margin: 0 auto; padding: 0 20px; }
+
+        .section-header {
+            display: flex; align-items: center; gap: 12px;
+            color: var(--hud-cyan); margin-bottom: 20px;
+            text-shadow: 0 0 10px var(--hud-cyan);
+        }
+
+        .diamond-glow {
+            width: 12px; height: 12px; background: var(--hud-cyan);
+            transform: rotate(45deg); box-shadow: 0 0 10px var(--hud-cyan);
+            flex-shrink: 0;
+        }
+
+        .profile-card {
+            display: grid; grid-template-columns: 200px 1fr;
+            background: var(--hud-blue-dark); border: 1px solid var(--hud-border);
+            margin-bottom: 40px; padding: 25px;
+            clip-path: polygon(0 0, 98% 0, 100% 10%, 100% 100%, 2% 100%, 0 90%);
+            border-left: 4px solid var(--hud-cyan);
+        }
+
+        .profile-img {
+            width: 180px; height: 180px; border: 1px solid var(--hud-cyan);
+            object-fit: cover; filter: grayscale(30%);
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(460px, 1fr));
+            gap: 25px;
+        }
+
+        
+        .oc-card {
+            text-decoration: none; color: #fff;
+            display: flex; flex-direction: column;
+            transition: transform 0.4s ease, filter 0.4s ease;
+            cursor: pointer;
+        }
+        .oc-card.hidden { display: none; }
+        .oc-card:hover { transform: translateY(-8px); filter: brightness(1.1); }
+        .oc-card:focus-visible { outline: 2px solid var(--hud-cyan); outline-offset: 4px; border-radius: 2px; }
+
+        .oc-tag {
+            display: flex; align-items: center; gap: 6px;
+            font-size: 0.8rem; font-weight: 600; margin-bottom: 6px;
+            letter-spacing: 1px;
+        }
+
+        .mini-sq { width: 6px; height: 6px; border: 1px solid currentColor; transform: rotate(45deg); flex-shrink: 0; }
+
+        .oc-frame {
+            display: flex; background: var(--hud-blue-dark);
+            border: 1px solid var(--hud-border);
+            clip-path: polygon(0 0, 95% 0, 100% 12%, 100% 100%, 0 100%);
+            min-height: 220px; overflow: hidden; position: relative;
+        }
+        .oc-frame::after {
+            content: ""; position: absolute; inset: 0;
+            background: linear-gradient(90deg, transparent 0%, rgba(185, 103, 255, 0.02) 100%);
+            pointer-events: none;
+        }
+
+        .oc-thumb { width: 180px; flex-shrink: 0; overflow: hidden; border-right: 1px solid var(--hud-border); }
+        .oc-thumb img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.6s; display: block; }
+        .oc-card:hover .oc-thumb img { transform: scale(1.08); }
+
+        .oc-body { padding: 20px; flex-grow: 1; display: flex; flex-direction: column; gap: 8px; }
+        .oc-title {
+            font-size: 1.3rem; font-family: 'Cinzel', serif;
+            color: #fff;
+            border-bottom: 1px solid rgba(185, 103, 255, 0.15);
+            padding-bottom: 8px;
+        }
+        .oc-summary { font-size: 0.9rem; color: #c0d0e0; line-height: 1.5; font-weight: 300; }
+        .oc-date { font-size: 0.7rem; color: rgba(185,103,255,0.35); letter-spacing: 1px; margin-top: auto; font-family: 'Cinzel', serif; }
+
+        
+        .oc-card.wip {
+            opacity: 0.45;
+            cursor: not-allowed;
+            pointer-events: none;
+            filter: grayscale(60%);
+        }
+
+
+        
+        #loadError {
+            display: none; text-align: center; padding: 60px 20px;
+            color: var(--command-red); font-family: 'Cinzel', serif;
+            letter-spacing: 2px; line-height: 2;
+        }
+        #loadError span { display: block; font-size: 0.8rem; color: #a0c0d0; font-family: 'Outfit', sans-serif; margin-top: 10px; letter-spacing: 0; }
+
+        
+        #noResults {
+            display: none; color: var(--hud-cyan);
+            font-family: 'Cinzel', serif; font-size: 0.9rem;
+            text-align: center; padding: 40px;
+            letter-spacing: 2px; opacity: 0.6;
+        }
+
+        
+        .status-bar {
+            position: fixed; bottom: 0; width: 100%;
+            background: var(--hud-cyan); color: var(--bg-deep);
+            padding: 6px 25px; font-size: 0.7rem; font-weight: 800;
+            display: flex; justify-content: space-between; z-index: 1000;
+            font-family: 'Cinzel', serif;
+        }
+
+        #scrollTop {
+            position: fixed; bottom: 50px; right: 20px;
+            background: var(--hud-cyan); border: none;
+            width: 36px; height: 36px;
+            display: none; align-items: center; justify-content: center;
+            clip-path: polygon(50% 0%, 100% 100%, 0% 100%);
+            z-index: 999; box-shadow: 0 0 15px var(--hud-cyan);
+            cursor: pointer; font-size: 0.8rem; color: var(--bg-deep); font-weight: bold;
+        }
+
+        .color-servant { color: var(--command-red); }
+        .color-master  { color: var(--hud-cyan); }
+        .color-general { color: var(--accent-gold); }
+        .color-canon   { color: #a855f7; }
+        
+        @media (max-width: 900px) {
+            .grid { grid-template-columns: 1fr; }
+            .profile-card {
+                grid-template-columns: 1fr;
+                text-align: left;
+                gap: 15px;
+                padding: 18px;
+            }
+            .profile-img {
+                width: 100px; height: 100px;
+                display: block;
+            }
+            .profile-card > div { padding: 0 !important; }
+            .profile-card h3 { font-size: 1.3rem !important; }
+            .profile-card p { font-size: 0.85rem !important; line-height: 1.7 !important; }
+            .oc-frame { min-height: 140px; }
+            .oc-thumb { width: 100px; }
+            .oc-title { font-size: 1rem; }
+            .oc-summary {
+                font-size: 0.82rem;
+                overflow: visible;
+                display: block;
+                -webkit-line-clamp: unset;
+                -webkit-box-orient: unset;
+            }
+            .oc-tag { font-size: 0.72rem; }
+            .oc-body { padding: 12px; gap: 6px; }
+            .status-bar span:last-child { display: none; }
+            .filter-panel { min-width: min(420px, 92vw); max-height: 60vh; }
+            .sort-toggle { margin-left: 0; }
+            .filter-row { gap: 7px; }
+        }
+        @media (max-width: 480px) {
+            .oc-thumb { width: 80px; }
+            .oc-title { font-size: 0.92rem; }
+            .oc-summary { font-size: 0.78rem; }
+            .profile-card h3 { font-size: 1.1rem !important; }
+            .control-panel { padding: 10px 12px; }
+            #searchInput { font-size: 0.88rem; padding: 10px 14px; }
+            .filter-trigger, .sort-toggle, .wip-toggle { font-size: 0.65rem; padding: 5px 10px; }
+        }
+    </style>
+</head>
+<body>
+
+    <header class="control-panel" id="controlPanel">
+        <div class="search-container">
+            <input type="text" id="searchInput" placeholder="SYSTEM_QUERY: ENTER DESIGNATION, CLASS, OR KEYWORD...">
+        </div>
+        <div class="filter-wrapper">
+            <div class="filter-row" id="filterRow">
+
+                
+                <button class="filter-trigger" id="filterTrigger" aria-haspopup="true" aria-expanded="false">
+                    OC_TYPE_FILTER <span class="filter-badge hidden" id="filterBadge"></span><span class="ft-arrow">▼</span>
+                </button>
+
+                
+                <div class="filter-panel" id="filterPanel" role="dialog" aria-label="Filter options">
+                    <div class="panel-group">
+                        <div class="panel-group-label" data-group="record-type">RECORD_TYPE <span class="pg-arrow">▼</span></div>
+                        <div class="panel-btns">
+                            <button class="filter-btn" data-filter="Servant">SERVANTS</button>
+                            <button class="filter-btn" data-filter="Master">MAGUS</button>
+                            <button class="filter-btn" data-filter="General">GENERAL_WORKS</button>
+                            <button class="filter-btn" data-filter="Canon">CANON</button>
+                        </div>
+                    </div>
+                    <div class="panel-group">
+                        <div class="panel-group-label" data-group="standard-classes">STANDARD_CLASSES <span class="pg-arrow">▼</span></div>
+                        <div class="panel-btns">
+                            <button class="filter-btn" data-filter="Saber">SABER</button>
+                            <button class="filter-btn" data-filter="Archer">ARCHER</button>
+                            <button class="filter-btn" data-filter="Lancer">LANCER</button>
+                            <button class="filter-btn" data-filter="Rider">RIDER</button>
+                            <button class="filter-btn" data-filter="Caster">CASTER</button>
+                            <button class="filter-btn" data-filter="Assassin">ASSASSIN</button>
+                            <button class="filter-btn" data-filter="Berserker">BERSERKER</button>
+                        </div>
+                    </div>
+                    <div class="panel-group">
+                        <div class="panel-group-label" data-group="extra-classes">EXTRA_CLASSES <span class="pg-arrow">▼</span></div>
+                        <div class="panel-btns">
+                            <button class="filter-btn" data-filter="Ruler">RULER</button>
+                            <button class="filter-btn" data-filter="Avenger">AVENGER</button>
+                            <button class="filter-btn" data-filter="Alter-Ego">ALTER-EGO</button>
+                            <button class="filter-btn" data-filter="Pretender">PRETENDER</button>
+                            <button class="filter-btn" data-filter="Shielder">SHIELDER</button>
+                            <button class="filter-btn" data-filter="Watcher">WATCHER</button>
+                            <button class="filter-btn" data-filter="Foreigner">FOREIGNER</button>
+                        </div>
+                    </div>
+                    <div class="panel-group">
+                        <div class="panel-group-label" data-group="magus-types">MAGUS_TYPES <span class="pg-arrow">▼</span></div>
+                        <div class="panel-btns">
+                            <button class="filter-btn" data-filter="Grand">GRAND</button>
+                            <button class="filter-btn" data-filter="Brand">BRAND</button>
+                            <button class="filter-btn" data-filter="Pride">PRIDE</button>
+                            <button class="filter-btn" data-filter="Fes">FES</button>
+                            <button class="filter-btn" data-filter="Cause">CAUSE</button>
+                            <button class="filter-btn" data-filter="Frame">FRAME</button>
+                            <button class="filter-btn" data-filter="Baldandar">BALDANDAR</button>
+                            <button class="filter-btn" data-filter="Atlas Alchemist">ATLAS_ALCHEMIST</button>
+                            <button class="filter-btn" data-filter="Eastern Magus">EASTERN_MAGUS</button>
+                            <button class="filter-btn" data-filter="Burial Agent">BURIAL_AGENT</button>
+                            <button class="filter-btn" data-filter="Executor">EXECUTOR</button>
+                            <button class="filter-btn" data-filter="Dead Apostle">DEAD_APOSTLE</button>
+                            <button class="filter-btn" data-filter="Spellcaster">SPELLCASTER</button>
+                        </div>
+                    </div>
+                    <div class="panel-group">
+                        <div class="panel-group-label" data-group="general-works-types">GENERAL_WORKS_TYPES <span class="pg-arrow">▼</span></div>
+                        <div class="panel-btns">
+                            <button class="filter-btn" data-filter="OC Setting">OC_SETTING</button>
+                            <button class="filter-btn" data-filter="Cyberpunk">CYBERPUNK</button>
+                            <button class="filter-btn" data-filter="Re: Zero">RE:_ZERO</button>
+                            <button class="filter-btn" data-filter="MHA">MHA</button>
+                            <button class="filter-btn" data-filter="Others">OTHERS</button>
+                        </div>
+                    </div>
+                </div>
+
+                
+                <div id="pillContainer" style="display:flex;flex-wrap:wrap;gap:6px;align-items:center;"></div>
+
+                
+                <button class="filter-clear hidden" id="filterClear">✕ CLEAR_ALL</button>
+
+                
+                <button class="sort-toggle" id="sortToggle" aria-pressed="false" title="Toggle sort by recently added">
+                    SORT: RECENTLY_ADDED
+                </button>
+                <button class="wip-toggle" id="wipToggle" title="Cycle WIP sort order">
+                    WIP: LAST
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="main-container">
+        <section>
+            <div class="section-header">
+                <div class="diamond-glow"></div>
+                <h2 style="font-family: 'Cinzel'; font-size: 1.2rem;">TERMINAL_USER_ID</h2>
+            </div>
+            <div class="profile-card">
+                <img src="assets/img/cd45218f647d073b3052181602c6e151.jpg"
+                     onerror="this.src='https://placehold.co/400x400/0a0512/b967ff?text=PORTRAIT'"
+                     alt="User Avatar" class="profile-img">
+                <div style="padding: 5px 15px;">
+                    <h3 style="color: var(--hud-cyan); font-size: 2rem; font-family: 'Cinzel'; margin-bottom: 10px;">_thirdheaven_overlord (Abso/Mo)</h3>
+                    <p style="color: #a0c0d0; line-height: 1.6; font-weight: 300;">
+                Nihilist | Historian | Proclaimed Divine<br>
+                "Do you know what punishments I've endured for my crimes, my sins? None. I am proof of the absurdity of men's most treasured abstractions. A just universe wouldn't tolerate my existence."<br>
+                <a href="https://youtu.be/JV--KBO5bgM?si=00F54fRcb1UkztZN" target="_blank" rel="noopener noreferrer" style="color: var(--hud-cyan);">水死体は恋したい - LonePi ↗</a>
+                </p>
+                </div>
+            </div>
+        </section>
+
+        <section>
+            <div class="section-header">
+                <div class="diamond-glow"></div>
+                <h2 style="font-family: 'Cinzel'; font-size: 1.2rem;">CENTRAL_ARCHIVE_RECORDS</h2>
+            </div>
+            <div class="grid" id="mainGrid"></div>
+            <div id="loadError">
+                [ DATA_LINK_FAILURE ]
+                <span>Could not load Works.json. Make sure it's in the same folder as index.html.<br>
+                If testing locally, use a local server (e.g. VS Code Live Server or <code>python -m http.server</code>).</span>
+            </div>
+            <div id="noResults">[ NO RECORDS MATCH QUERY ]</div>
+        </section>
+    </main>
+
+    <button id="scrollTop" aria-label="Scroll to top">▲</button>
+
+    <footer class="status-bar">
+        <span>SESSION: ENCRYPTED</span>
+        <span id="counterDisplay">LOADING_RECORDS...</span>
+        <span>CHALDEAS_SYSTEM_MO_v4.2.0</span>
+    </footer>
+
+    <script>
+        const EXTRA_CLASSES = new Set(['Alter-Ego','Pretender','Avenger','Ruler','Shielder','Watcher','Foreigner']);
+
+        let sortMode   = 'priority';
+        let wipSort    = 'last';   
+        let allEntries = [];
+        let activeFilters = new Set(); 
+
+        
+        const mainGrid       = document.getElementById('mainGrid');
+        const searchInput    = document.getElementById('searchInput');
+        const scrollBtn      = document.getElementById('scrollTop');
+        const noResults      = document.getElementById('noResults');
+        const loadError      = document.getElementById('loadError');
+        const counterDisplay = document.getElementById('counterDisplay');
+        const controlPanel   = document.getElementById('controlPanel');
+        const sortToggle     = document.getElementById('sortToggle');
+        const wipToggle      = document.getElementById('wipToggle');
+        const filterTrigger  = document.getElementById('filterTrigger');
+        const filterPanel    = document.getElementById('filterPanel');
+        const filterBadge    = document.getElementById('filterBadge');
+        const filterClear    = document.getElementById('filterClear');
+        const pillContainer  = document.getElementById('pillContainer');
+
+        
+        function syncHeaderHeight() {
+            const h = controlPanel.getBoundingClientRect().height;
+            document.documentElement.style.setProperty('--header-height', (h + 20) + 'px');
+        }
+        new ResizeObserver(syncHeaderHeight).observe(controlPanel);
+        syncHeaderHeight();
+
+        
+        filterTrigger.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const isOpen = filterPanel.classList.toggle('open');
+            filterTrigger.classList.toggle('open', isOpen);
+            filterTrigger.setAttribute('aria-expanded', String(isOpen));
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!filterPanel.contains(e.target) && e.target !== filterTrigger) {
+                filterPanel.classList.remove('open');
+                filterTrigger.classList.remove('open');
+                filterTrigger.setAttribute('aria-expanded', 'false');
+            }
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                filterPanel.classList.remove('open');
+                filterTrigger.classList.remove('open');
+                filterTrigger.setAttribute('aria-expanded', 'false');
+            }
+        });
+
+        
+        document.querySelectorAll('.panel-group-label').forEach(label => {
+            label.addEventListener('click', function(e) {
+                e.stopPropagation();
+                this.closest('.panel-group').classList.toggle('collapsed');
+            });
+        });
+
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                const f = this.dataset.filter;
+                if (activeFilters.has(f)) {
+                    activeFilters.delete(f);
+                    this.classList.remove('active');
+                } else {
+                    activeFilters.add(f);
+                    this.classList.add('active');
+                }
+                renderPills();
+                updateUI();
+            });
+        });
+
+        
+        function renderPills() {
+            pillContainer.innerHTML = '';
+            const count = activeFilters.size;
+
+            
+            if (count > 0) {
+                filterBadge.textContent = count;
+                filterBadge.classList.remove('hidden');
+                filterClear.classList.remove('hidden');
+            } else {
+                filterBadge.classList.add('hidden');
+                filterClear.classList.add('hidden');
+            }
+
+            
+            activeFilters.forEach(f => {
+                const pill = document.createElement('button');
+                pill.className = 'active-pill';
+                pill.innerHTML = `${f.toUpperCase()} <span class="pill-x">✕</span>`;
+                pill.addEventListener('click', () => {
+                    activeFilters.delete(f);
+                    const btn = document.querySelector(`.filter-btn[data-filter="${f}"]`);
+                    if (btn) btn.classList.remove('active');
+                    renderPills();
+                    updateUI();
+                });
+                pillContainer.appendChild(pill);
+            });
+
+            syncHeaderHeight();
+        }
+
+        
+        filterClear.addEventListener('click', () => {
+            activeFilters.clear();
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            renderPills();
+            updateUI();
+        });
+
+        
+        sortToggle.addEventListener('click', () => {
+            sortMode = sortMode === 'priority' ? 'recent' : 'priority';
+            const isRecent = sortMode === 'recent';
+            sortToggle.classList.toggle('active', isRecent);
+            sortToggle.setAttribute('aria-pressed', String(isRecent));
+            sortToggle.textContent = isRecent ? 'SORT: RECENTLY_ADDED ✦' : 'SORT: RECENTLY_ADDED';
+            rebuildGrid();
+        });
+
+        
+        wipToggle.addEventListener('click', () => {
+            if (wipSort === 'last')       wipSort = 'first';
+            else if (wipSort === 'first') wipSort = 'off';
+            else                          wipSort = 'last';
+
+            wipToggle.classList.remove('wip-last', 'wip-first');
+            if (wipSort === 'last') {
+                wipToggle.textContent = 'WIP: LAST';
+            } else if (wipSort === 'first') {
+                wipToggle.classList.add('wip-first');
+                wipToggle.textContent = 'WIP: FIRST';
+            } else {
+                wipToggle.classList.add('wip-last');
+                wipToggle.textContent = 'WIP: MIXED';
+            }
+            rebuildGrid();
+        });
+
+        
+        async function loadData() {
+            try {
+                const res = await fetch('Works.json?t=' + Date.now());
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                allEntries = await res.json();
+                rebuildGrid();
+            } catch (err) {
+                console.error('Failed to load Works.json:', err);
+                loadError.style.display = 'block';
+                counterDisplay.textContent = 'DATA_LINK_FAILURE';
+            }
+        }
+
+        
+        function getSorted(entries) {
+            let sorted;
+            if (sortMode === 'recent') {
+                sorted = [...entries].sort((a, b) => {
+                    const da = a.dateAdded ? new Date(a.dateAdded) : new Date(0);
+                    const db = b.dateAdded ? new Date(b.dateAdded) : new Date(0);
+                    return db - da;
+                });
+            } else {
+                const priority = { "Servant": 1, "Master": 2, "General Works": 3, "Canon": 4 };
+                sorted = [...entries].sort((a, b) => (priority[a.type] ?? 99) - (priority[b.type] ?? 99));
+            }
+
+            
+            if (wipSort === 'last') {
+                sorted.sort((a, b) => (a.wip ? 1 : 0) - (b.wip ? 1 : 0));
+            } else if (wipSort === 'first') {
+                sorted.sort((a, b) => (b.wip ? 1 : 0) - (a.wip ? 1 : 0));
+            }
+           
+
+            return sorted;
+        }
+
+        
+        function rebuildGrid() {
+            mainGrid.innerHTML = '';
+            const sorted = getSorted(allEntries);
+            const fragment = document.createDocumentFragment();
+
+            sorted.forEach(oc => {
+                if (!oc.title || !oc.type || !oc.sub) return;
+
+                const card = document.createElement('a');
+                card.className = oc.wip ? 'oc-card wip' : 'oc-card';
+                card.href   = oc.wip ? undefined : (oc.link || '#');
+                card.target = oc.wip ? undefined : '_blank';
+                card.rel    = oc.wip ? undefined : 'noopener noreferrer';
+                card.setAttribute('aria-label', oc.wip ? `${oc.title} — record incomplete` : `Open ${oc.title} document`);
+                card.dataset.search = `${oc.title.toLowerCase()} ${oc.sub.toLowerCase()} ${(oc.summary || '').toLowerCase()}`;
+                card.dataset.type   = oc.type;
+                card.dataset.sub    = oc.sub;
+
+                const imgEl = document.createElement('img');
+                imgEl.alt     = `${oc.title} portrait`;
+                imgEl.loading = 'lazy';
+                if (oc.img) {
+                    imgEl.src = oc.img;
+                    if (oc.imgFallback) {
+                        imgEl.onerror = function () {
+                            this.onerror = function () {
+                                this.style.display = 'none';
+                                this.parentElement.style.background = 'rgba(185,103,255,0.05)';
+                            };
+                            this.src = oc.imgFallback;
+                        };
+                    } else {
+                        imgEl.onerror = function () {
+                            this.style.display = 'none';
+                            this.parentElement.style.background = 'rgba(185,103,255,0.05)';
+                        };
+                    }
+                } else {
+                    imgEl.style.display = 'none';
+                }
+
+                const thumb = document.createElement('div');
+                thumb.className = 'oc-thumb';
+                thumb.appendChild(imgEl);
+
+                const titleEl = document.createElement('div');
+                titleEl.className   = 'oc-title';
+                titleEl.textContent = oc.title;
+
+                const summaryEl = document.createElement('div');
+                summaryEl.className   = 'oc-summary';
+                summaryEl.textContent = oc.summary || '';
+
+                const body = document.createElement('div');
+                body.className = 'oc-body';
+                body.appendChild(titleEl);
+                body.appendChild(summaryEl);
+
+                if (oc.dateAdded) {
+                    const dateEl = document.createElement('div');
+                    dateEl.className   = 'oc-date';
+                    dateEl.textContent = `INDEXED: ${oc.dateAdded}`;
+                    dateEl.dataset.dateEl = 'true';
+                    body.appendChild(dateEl);
+                }
+
+                const frame = document.createElement('div');
+                frame.className = 'oc-frame';
+                frame.appendChild(thumb);
+                frame.appendChild(body);
+
+                const dot = document.createElement('div');
+                dot.className = 'mini-sq';
+                const tagText = document.createTextNode(` ${oc.sub.toUpperCase()} // ${oc.type.toUpperCase()}`);
+                const tag = document.createElement('div');
+                tag.className = `oc-tag ${oc.color || ''}`;
+                tag.appendChild(dot);
+                tag.appendChild(tagText);
+
+                card.appendChild(tag);
+                card.appendChild(frame);
+                fragment.appendChild(card);
+            });
+
+            mainGrid.appendChild(fragment);
+
+            document.querySelectorAll('[data-date-el]').forEach(el => {
+                el.style.display = sortMode === 'recent' ? 'block' : 'none';
+            });
+
+            updateUI();
+        }
+
+        
+        const MAGUS_TYPES = new Set(['Grand','Brand','Pride','Fes','Cause','Frame','Baldandar','Atlas Alchemist','Eastern Magus','Burial Agent','Executor','Dead Apostle','Spellcaster']);
+        const GW_TYPES    = new Set(['OC Setting','Cyberpunk','Re: Zero','MHA','Others']);
+
+        function cardMatchesFilters(card) {
+            if (activeFilters.size === 0) return true;
+            for (const f of activeFilters) {
+                const typeMatch  = card.dataset.type === f
+                    || (card.dataset.type === 'General Works' && f === 'General');
+                const subMatch   = card.dataset.sub === f;
+                const extraMatch = f === 'Extra' && EXTRA_CLASSES.has(card.dataset.sub);
+                if (typeMatch || subMatch || extraMatch) return true;
+            }
+            return false;
+        }
+
+        function updateUI() {
+            const query  = searchInput.value.toLowerCase().trim();
+            let visible  = 0;
+
+            document.querySelectorAll('.oc-card').forEach(card => {
+                const matchesSearch  = !query || card.dataset.search.includes(query);
+                const matchesFilter  = cardMatchesFilters(card);
+                const show = matchesSearch && matchesFilter;
+                card.classList.toggle('hidden', !show);
+                if (show) visible++;
+            });
+
+            const label = visible === 1 ? 'RECORD' : 'RECORDS';
+            counterDisplay.textContent = `DISPLAYED_${label}: ${String(visible).padStart(2, '0')}`;
+            noResults.style.display = visible === 0 && loadError.style.display === 'none' ? 'block' : 'none';
+        }
+
+        
+        let rafPending = false;
+        window.addEventListener('scroll', () => {
+            if (rafPending) return;
+            rafPending = true;
+            requestAnimationFrame(() => {
+                scrollBtn.style.display = window.scrollY > 500 ? 'flex' : 'none';
+                rafPending = false;
+            });
+        }, { passive: true });
+
+        scrollBtn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+        searchInput.addEventListener('input', updateUI);
+
+        loadData();
+    </script>
+</body>
+</html>

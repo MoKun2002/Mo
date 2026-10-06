@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CHALDEA | 404 — Record Not Found</title>
+    <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --hud-cyan: #00f2ff;
+            --bg-deep: #01080f;
+            --command-red: #ff3c3c;
+            --hud-border: #0088cc;
+            --scanline: rgba(0, 242, 255, 0.03);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background-color: var(--bg-deep);
+            background-image:
+                linear-gradient(rgba(1, 8, 15, 0.85), rgba(1, 8, 15, 0.85)),
+                url('https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=2072&auto=format&fit=crop');
+            background-size: cover; background-position: center; background-attachment: fixed;
+            color: #fff; font-family: 'Outfit', sans-serif;
+            min-height: 100vh; display: flex; flex-direction: column;
+            align-items: center; justify-content: center; text-align: center;
+            padding: 40px 20px;
+        }
+        body::before {
+            content: ""; position: fixed; inset: 0;
+            background-image:
+                linear-gradient(var(--scanline) 1px, transparent 1px),
+                linear-gradient(90deg, var(--scanline) 1px, transparent 1px);
+            background-size: 30px 30px; pointer-events: none; z-index: 0;
+        }
+        .content { position: relative; z-index: 1; max-width: 600px; }
+        .error-code {
+            font-family: 'Cinzel', serif;
+            font-size: clamp(5rem, 20vw, 9rem);
+            color: var(--command-red);
+            text-shadow: 0 0 40px rgba(255, 60, 60, 0.4);
+            line-height: 1; margin-bottom: 10px;
+            letter-spacing: 8px;
+        }
+        .error-label {
+            font-family: 'Cinzel', serif; font-size: 0.8rem;
+            color: var(--hud-cyan); letter-spacing: 4px;
+            margin-bottom: 30px;
+            text-shadow: 0 0 10px var(--hud-cyan);
+        }
+        .divider {
+            width: 60px; height: 1px;
+            background: linear-gradient(90deg, transparent, var(--hud-cyan), transparent);
+            margin: 0 auto 30px;
+        }
+        .message {
+            color: #a0c0d0; line-height: 1.8; font-weight: 300;
+            font-size: 0.95rem; margin-bottom: 40px;
+        }
+        .home-btn {
+            display: inline-block; text-decoration: none;
+            border: 1px solid var(--hud-border); color: var(--hud-cyan);
+            padding: 10px 28px; font-family: 'Cinzel', serif;
+            font-size: 0.75rem; letter-spacing: 2px;
+            clip-path: polygon(10% 0, 100% 0, 90% 100%, 0 100%);
+            transition: background 0.3s, box-shadow 0.3s;
+        }
+        .home-btn:hover {
+            background: rgba(0, 242, 255, 0.15);
+            box-shadow: 0 0 15px rgba(0, 242, 255, 0.2);
+        }
+        .status-bar {
+            position: fixed; bottom: 0; width: 100%;
+            background: var(--hud-cyan); color: var(--bg-deep);
+            padding: 6px 25px; font-size: 0.7rem; font-weight: 800;
+            display: flex; justify-content: space-between;
+            font-family: 'Cinzel', serif; z-index: 10;
+        }
+    </style>
+</head>
+<body>
+    <div class="content">
+        <div class="error-code">404</div>
+        <div class="error-label">[ RECORD_NOT_FOUND ]</div>
+        <div class="divider"></div>
+        <p class="message">
+            The requested Saint Graph entry does not exist in the Chaldea database.<br>
+            The node may have been moved, deleted, or never manifested.
+        </p>
+        <a href="/Website/" class="home-btn">RETURN_TO_ARCHIVE</a>
+    </div>
+    <footer class="status-bar">
+        <span>SESSION: ENCRYPTED</span>
+        <span>ERROR: NODE_UNRESOLVED</span>
+        <span>CHALDEA_SYSTEMS_v4.2.0</span>
+    </footer>
+</body>
+</html>
